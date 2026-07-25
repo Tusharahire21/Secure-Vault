@@ -1,0 +1,102 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Anomaly #{{ anomaly.pk }}{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'dashboard:index' %}" class="btn btn-sm sv-btn-back">
+        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+    </a>
+</div>
+
+<!-- ========== DETAIL HEADER ========== -->
+<div class="sv-detail-header mb-4">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div class="sv-detail-icon sv-icon-{{ anomaly.severity|lower }}">
+            <i class="bi bi-{{ anomaly.event_icon }}"></i>
+        </div>
+        <div>
+            <h1 class="sv-detail-title">{{ anomaly.get_event_type_display }}</h1>
+            <div class="d-flex gap-2 mt-1 flex-wrap">
+                <span class="badge bg-{{ anomaly.severity_class }} sv-sev-badge-lg">
+                    {{ anomaly.severity }}
+                </span>
+                <code class="sv-ip">{{ anomaly.ip }}</code>
+                <span class="text-muted">{{ anomaly.timestamp }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== INFO CARDS ========== -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="sv-info-card">
+            <div class="sv-info-label">Event Type</div>
+            <div class="sv-info-value">{{ anomaly.get_event_type_display }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="sv-info-card">
+            <div class="sv-info-label">Occurrences</div>
+            <div class="sv-info-value sv-count-lg">{{ anomaly.count }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="sv-info-card">
+            <div class="sv-info-label">HTTP Status</div>
+            <div class="sv-info-value"><span class="sv-status sv-status-{{ anomaly.status_code }}">{{ anomaly.status_code }}</span></div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="sv-info-card">
+            <div class="sv-info-label">Source File</div>
+            <div class="sv-info-value sv-mono">{{ anomaly.source_file|default:"N/A" }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== DESCRIPTION ========== -->
+<div class="sv-detail-section mb-3">
+    <div class="sv-section-title"><i class="bi bi-file-text me-2"></i>Description</div>
+    <p class="sv-desc-full">{{ anomaly.description }}</p>
+</div>
+
+<!-- ========== AFFECTED PATHS ========== -->
+{% if anomaly.paths %}
+<div class="sv-detail-section mb-3">
+    <div class="sv-section-title"><i class="bi bi-link-45deg me-2"></i>Affected Paths ({{ anomaly.paths|length }})</div>
+    <div class="sv-paths-grid">
+        {% for path in anomaly.paths %}
+        <code class="sv-path-item">{{ path }}</code>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- ========== RAW LOG LINES ========== -->
+{% if anomaly.raw_lines %}
+<div class="sv-detail-section mb-3">
+    <div class="sv-section-title"><i class="bi bi-terminal me-2"></i>Sample Raw Log Lines</div>
+    <div class="sv-log-block">
+        {% for line in anomaly.raw_lines %}
+        <div class="sv-log-line">{{ line }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- ========== METADATA ========== -->
+<div class="sv-detail-section">
+    <div class="sv-section-title"><i class="bi bi-info-circle me-2"></i>Metadata</div>
+    <table class="table sv-meta-table">
+        <tbody>
+            <tr><th>Anomaly ID</th><td>#{{ anomaly.pk }}</td></tr>
+            <tr><th>Detected At</th><td>{{ anomaly.created_at }}</td></tr>
+            <tr><th>IP Address</th><td><code>{{ anomaly.ip }}</code></td></tr>
+            <tr><th>Log Timestamp</th><td>{{ anomaly.timestamp }}</td></tr>
+            <tr><th>Severity</th><td><span class="badge bg-{{ anomaly.severity_class }}">{{ anomaly.severity }}</span></td></tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

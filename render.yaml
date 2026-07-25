@@ -1,0 +1,29 @@
+# render.yaml — Render Blueprint
+# Defines the web service and its linked PostgreSQL database.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: securevault
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn securevault.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true          # Render auto-generates a secure random value
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"       # Allow all *.onrender.com subdomains
+      - key: DATABASE_URL
+        fromDatabase:
+          name: securevault-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+
+databases:
+  - name: securevault-db
+    databaseName: securevault
+    user: securevault_user
+    plan: free

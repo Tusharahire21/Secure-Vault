@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SecureVault{% endblock %} – Server Log Anomaly Detection</title>
+    <meta name="description" content="SecureVault: Real-time server log monitoring and anomaly detection dashboard for cybersecurity.">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dashboard/css/style.css' %}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-dark sv-navbar">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'dashboard:index' %}">
+            <span class="sv-logo-icon"><i class="bi bi-shield-lock-fill"></i></span>
+            <span class="fw-bold">Secure<span class="sv-accent">Vault</span></span>
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <span class="sv-badge-status">
+                <span class="sv-dot"></span> Live Monitor
+            </span>
+            <form method="post" action="{% url 'dashboard:ingest' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm sv-btn-ingest" id="btn-ingest">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Run Ingest
+                </button>
+            </form>
+            <a href="/api/anomalies/" target="_blank" class="btn btn-sm sv-btn-api">
+                <i class="bi bi-braces me-1"></i> API
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ========== MESSAGES ========== -->
+{% if messages %}
+<div class="container-fluid px-4 mt-2">
+    {% for msg in messages %}
+    <div class="alert alert-{% if msg.tags == 'error' %}danger{% elif msg.tags == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show sv-alert" role="alert">
+        <i class="bi bi-{% if msg.tags == 'error' %}x-circle{% elif msg.tags == 'warning' %}exclamation-triangle{% else %}check-circle{% endif %} me-2"></i>
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="container-fluid px-4 py-3">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="sv-footer text-center py-3 mt-4">
+    <small class="text-muted">
+        SecureVault &copy; 2026 &mdash; MCA Python Project &mdash; Server Log Anomaly Detection System
+    </small>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% load static %}
+<script src="{% static 'dashboard/js/main.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
